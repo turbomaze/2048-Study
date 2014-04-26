@@ -62,7 +62,7 @@ HTMLActuator.prototype.addTile = function (tile) {
   this.applyClasses(wrapper, classes);
 
   inner.classList.add("tile-inner");
-  inner.textContent = tile.value;
+  inner.textContent = tile.value === 0 ? '?' : tile.value;
 
   if (tile.previousPosition) {
     // Make sure that the tile gets rendered in the previous position first
@@ -136,4 +136,9 @@ HTMLActuator.prototype.clearMessage = function () {
   // IE only takes one value to remove at a time.
   this.messageContainer.classList.remove("game-won");
   this.messageContainer.classList.remove("game-over");
+};
+
+HTMLActuator.prototype.askStudyQuestion = function() {
+	var foo = prompt("Name one author of the declaration of independence.");
+	if (foo !== 'foo') console.log('u suk');
 };
