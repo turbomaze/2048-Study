@@ -555,6 +555,9 @@ input[type=range]:focus {
 	float: right;
 	margin-bottom: 10px;
 }
+#which-set {
+	margin-top: 10px;
+}
 
 @media screen and (max-width: 520px) {
   html, body {

@@ -157,7 +157,7 @@ HTMLActuator.prototype.getRandomQandA = function() {
 		return Math.floor(low + Math.random()*(high-low));
 	}
 
-	var set = 'apush';
+	var set = document.getElementById('which-set').value;
 	var idx = getRandInt(0, QuestionData[set].length);
 	return QuestionData[set][idx];
 };
