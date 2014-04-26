@@ -54,17 +54,18 @@ KeyboardInputManager.prototype.listen = function () {
     var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
                     event.shiftKey;
     var mapped    = map[event.which];
+	var questionOverlay = document.querySelector(".game-message.question");
 
     if (!modifiers) {
       if (mapped !== undefined) {
-        if (document.activeElement.id !== 'answer-to-question') event.preventDefault();
+        if (questionOverlay.style.display !== 'block') event.preventDefault();
         self.emit("move", mapped);
       }
     }
 
     // R key restarts the game
     if (!modifiers && event.which === 82) {
-      self.restart.call(self, event);
+      if (questionOverlay.style.display !== 'block') self.restart.call(self, event);
     }
   });
 

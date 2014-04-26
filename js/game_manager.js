@@ -308,7 +308,7 @@ GameManager.prototype.mergeTiles = function(a, b) {
 
 GameManager.prototype.processAnswer = function () {
   var attempt = document.getElementById("answer-to-question").value;
-  if (attempt === this.currentAnswer) {
+  if (attempt.toLowerCase() === this.currentAnswer.toLowerCase()) {
 	document.querySelector(".game-message.question").style.display = 'none';
 	document.getElementById("answer-to-question").value = ''
 	this.isPaused = false; //unpause
