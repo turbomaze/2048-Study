@@ -57,6 +57,7 @@ KeyboardInputManager.prototype.listen = function () {
 	var questionOverlay = document.querySelector(".game-message.question");
 
     if (!modifiers) {
+	  //wasd, hjkl, and <^v> and the game isn't paused
       if (mapped !== undefined && questionOverlay.style.display !== 'block') {
         event.preventDefault();
         self.emit("move", mapped);
@@ -66,6 +67,13 @@ KeyboardInputManager.prototype.listen = function () {
     // R key restarts the game
     if (!modifiers && event.which === 82 && questionOverlay.style.display !== 'block') {
       self.restart.call(self, event);
+    }
+
+	// [enter] key submits the user's answer when...
+    if (!modifiers && event.which === 13 &&
+	    questionOverlay.style.display === 'block' && //they're paused
+		document.activeElement.id === 'answer-to-question') { //and focused on the text input
+      self.submitAnswer();
     }
   });
 
@@ -140,7 +148,6 @@ KeyboardInputManager.prototype.keepPlaying = function (event) {
 };
 
 KeyboardInputManager.prototype.submitAnswer = function (event) {
-  event.preventDefault();
   this.emit("submitAnswer");
 };
 
