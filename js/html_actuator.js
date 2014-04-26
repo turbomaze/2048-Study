@@ -1,8 +1,8 @@
 function HTMLActuator() {
-  this.tileContainer    = document.querySelector(".tile-container");
-  this.scoreContainer   = document.querySelector(".score-container");
-  this.bestContainer    = document.querySelector(".best-container");
-  this.messageContainer = document.querySelector(".game-message");
+  this.tileContainer     = document.querySelector(".tile-container");
+  this.scoreContainer    = document.querySelector(".score-container");
+  this.bestContainer     = document.querySelector(".best-container");
+  this.messageContainer  = document.querySelector(".game-message.core");
 
   this.score = 0;
 }
@@ -62,7 +62,7 @@ HTMLActuator.prototype.addTile = function (tile) {
   this.applyClasses(wrapper, classes);
 
   inner.classList.add("tile-inner");
-  inner.textContent = tile.value;
+  inner.textContent = tile.value === 0 ? '?' : tile.value;
 
   if (tile.previousPosition) {
     // Make sure that the tile gets rendered in the previous position first
@@ -136,4 +136,36 @@ HTMLActuator.prototype.clearMessage = function () {
   // IE only takes one value to remove at a time.
   this.messageContainer.classList.remove("game-won");
   this.messageContainer.classList.remove("game-over");
+};
+
+HTMLActuator.prototype.askStudyQuestion = function(GM) {
+	var questionContainer = document.querySelector(".game-message.question");
+	var p = questionContainer.getElementsByTagName("p")[0];
+	
+	var questionAndAns = this.getRandomQandA();
+	GM.currentAnswer = questionAndAns[1];
+	
+	questionContainer.style.display = 'block';
+	p.textContent = questionAndAns[0];
+	setTimeout(function() {
+		document.getElementById('answer-to-question').focus(true);
+	}, 500);
+};
+
+HTMLActuator.prototype.getRandomQandA = function() {
+	function getRandInt(low, high) { //output is in [low, high)
+		return Math.floor(low + Math.random()*(high-low));
+	}
+
+	var set = 'apush';
+	var data = {
+		'apush' : [
+			['Who was the first president of the United States?', 'George Washington'],
+			['Who is on the twenty dollar bill?', 'Andrew Jackson'],
+			['Who was the second president to be assasinated?', 'James Garfield'],
+			['What was the last name of the main Great Depression president?', 'Roosevelt'],
+		]
+	};
+	var idx = getRandInt(0, data[set].length);
+	return data[set][idx];
 };

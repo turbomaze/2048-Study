@@ -54,17 +54,18 @@ KeyboardInputManager.prototype.listen = function () {
     var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
                     event.shiftKey;
     var mapped    = map[event.which];
+	var questionOverlay = document.querySelector(".game-message.question");
 
     if (!modifiers) {
       if (mapped !== undefined) {
-        event.preventDefault();
+        if (questionOverlay.style.display !== 'block') event.preventDefault();
         self.emit("move", mapped);
       }
     }
 
     // R key restarts the game
     if (!modifiers && event.which === 82) {
-      self.restart.call(self, event);
+      if (questionOverlay.style.display !== 'block') self.restart.call(self, event);
     }
   });
 
@@ -72,6 +73,7 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
+  this.bindButtonPress(".answer-btn", this.submitAnswer);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -135,6 +137,11 @@ KeyboardInputManager.prototype.restart = function (event) {
 KeyboardInputManager.prototype.keepPlaying = function (event) {
   event.preventDefault();
   this.emit("keepPlaying");
+};
+
+KeyboardInputManager.prototype.submitAnswer = function (event) {
+  event.preventDefault();
+  this.emit("submitAnswer");
 };
 
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
