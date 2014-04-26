@@ -6,14 +6,15 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
   this.startTiles     = 2;
   this.moveCount      = 0;
-  this.currentAnswer  = '';
-  this.isPaused       = true;
+  this.currentAnswers = [''];
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
   this.inputManager.on("submitAnswer", this.processAnswer.bind(this));
+  this.inputManager.on("rangeChange", this.dealWithRange.bind(this));
 
+  this.dealWithRange();
   this.setup();
 }
 
@@ -43,22 +44,30 @@ GameManager.prototype.setup = function () {
   if (previousState) {
     this.grid        = new Grid(previousState.grid.size,
                                 previousState.grid.cells); // Reload grid
-    this.score         = previousState.score;
-    this.over          = previousState.over;
-    this.won           = previousState.won;
-    this.keepPlaying   = previousState.keepPlaying;
-	this.moveCount     = previousState.moveCount;
-	this.currentAnswer = '';
-	this.isPaused      = false;
+    this.score          = previousState.score;
+    this.over           = previousState.over;
+    this.won            = previousState.won;
+    this.keepPlaying    = previousState.keepPlaying;
+	this.moveCount      = previousState.moveCount;
+	this.currentAnswers = [''];
+	this.isPaused       = false;
+	this.qFreq          = previousState.qFreq;
+		document.getElementById('question-freq').value = this.qFreq;
+		this.dealWithRange();
+		console.log('a',document.getElementById('question-freq').value,this.qFreq);
   } else {
-    this.grid        = new Grid(this.size);
-    this.score       = 0;
-    this.over        = false;
-    this.won         = false;
-    this.keepPlaying = false;
-	this.moveCount   = 0;
-	this.currentAnswer = '';
-	this.isPaused      = false;
+    this.grid           = new Grid(this.size);
+    this.score          = 0;
+    this.over           = false;
+    this.won            = false;
+    this.keepPlaying    = false;
+	this.moveCount      = 0;
+	this.currentAnswers = [''];
+	this.isPaused       = false;
+	this.qFreq          = 30; //out of 300
+		document.getElementById('question-freq').value = this.qFreq;
+		this.dealWithRange();
+		console.log('b',document.getElementById('question-freq').value,this.qFreq);
 
     // Add the initial tiles
     this.addStartTiles();
@@ -78,7 +87,10 @@ GameManager.prototype.addStartTiles = function () {
 // Adds a tile in a random position
 GameManager.prototype.addRandomTile = function () {
   if (this.grid.cellsAvailable()) {
-    var value = Math.random() < 0.9 ? 2 : 0; //0 means it's a study question
+    //300 was chosen so the max ? freq would be 33.3_%
+    var decimalFrequency = this.qFreq/300;
+		decimalFrequency = Math.min(Math.max(0, decimalFrequency), 1);
+    var value = Math.random() < decimalFrequency ? 0 : 2; //0 means it's a study question
     var tile = new Tile(this.grid.randomAvailableCell(), value);
 
     this.grid.insertTile(tile);
@@ -99,14 +111,15 @@ GameManager.prototype.actuate = function () {
   }
 
   this.actuator.actuate(this.grid, {
-    score:         this.score,
-    over:          this.over,
-    won:           this.won,
-    bestScore:     this.storageManager.getBestScore(),
-    terminated:    this.isGameTerminated(),
-	moveCount:     this.moveCount,
-	currentAnswer: this.currentAnswer,
-	isPaused:      this.isPaused
+    score:          this.score,
+    over:           this.over,
+    won:            this.won,
+    bestScore:      this.storageManager.getBestScore(),
+    terminated:     this.isGameTerminated(),
+	moveCount:      this.moveCount,
+	currentAnswers: this.currentAnswers,
+	isPaused:       this.isPaused,
+	qFreq:          this.qFreq
   });
 
 };
@@ -114,14 +127,15 @@ GameManager.prototype.actuate = function () {
 // Represent the current game as an object
 GameManager.prototype.serialize = function () {
   return {
-    grid:          this.grid.serialize(),
-    score:         this.score,
-    over:          this.over,
-    won:           this.won,
-    keepPlaying:   this.keepPlaying,
-	moveCount:     this.moveCount,
-	currentAnswer: this.currentAnswer,
-	isPaused:      this.isPaused
+    grid:           this.grid.serialize(),
+    score:          this.score,
+    over:           this.over,
+    won:            this.won,
+    keepPlaying:    this.keepPlaying,
+	moveCount:      this.moveCount,
+	currentAnswers: this.currentAnswers,
+	isPaused:       this.isPaused,
+	qFreq:          this.qFreq
   };
 };
 
@@ -146,7 +160,7 @@ GameManager.prototype.moveTile = function (tile, cell) {
 GameManager.prototype.move = function (direction) {
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
-console.log(this.isPaused);
+
   if (this.isGameTerminated() || this.isPaused) {
 	return; // Don't do anything if the game's over
   }
@@ -307,12 +321,42 @@ GameManager.prototype.mergeTiles = function(a, b) {
 };
 
 GameManager.prototype.processAnswer = function () {
-  var attempt = document.getElementById("answer-to-question").value;
-  if (attempt.toLowerCase() === this.currentAnswer.toLowerCase()) {
-	document.querySelector(".game-message.question").style.display = 'none';
-	document.getElementById("answer-to-question").value = ''
-	this.isPaused = false; //unpause
-  } else {
-	document.getElementById("answer-to-question").value = ''; //try again
-  }
+	var attempt = document.getElementById("answer-to-question").value;
+	if (this.answerIsCorrect(attempt, this.currentAnswers)) {
+		document.querySelector(".game-message.question").style.display = 'none';
+		document.getElementById("answer-to-question").value = ''
+		this.isPaused = false; //unpause
+	} else {
+		document.getElementById("answer-to-question").value = ''; //try again
+	}
+};
+
+GameManager.prototype.answerIsCorrect = function(guess, acceptables) {
+	guess = guess.toLowerCase().replace(/\W/g, ''); //remove non-alphanum chars
+	for (var ai = 0; ai < acceptables.length; ai++) {
+		if (guess === acceptables[ai].toLowerCase().replace(/\W/g, '')) {
+			return true; //return true if any match up
+		}
+	}
+	return false; //if none do, then return false
+};
+
+GameManager.prototype.dealWithRange = function() {
+	var range = document.getElementById('question-freq');
+	var freqComment = document.getElementById('freq-description');
+	var newFreq = parseInt(range.value); //newFreq in [0,100]
+	if (newFreq === 0) {
+		freqComment.innerHTML = 'that\'s not even studying';
+	} else {
+		var msgs = [
+			'noob casual',
+			'one in ten blocks',
+			'uh-oh gettin\' serious',
+			'one in four blocks',
+			'CRAM LEVEL 9000',
+		];
+		var idx = Math.min(Math.floor((newFreq/100)*msgs.length), msgs.length-1);
+		freqComment.innerHTML = msgs[idx];
+	}
+	this.qFreq = newFreq;
 };

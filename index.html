@@ -15,6 +15,8 @@
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+  
+  <script src="js/question_data.js"></script>
 </head>
 <body>
   <div class="container">
@@ -78,6 +80,25 @@
       <div class="tile-container">
 
       </div>
+    </div>
+	
+	<div class="below-game">
+	  <label for="question-freq">
+	    ? frequency:
+	  </label>
+	  <span id="freq-description">
+		That's not even studying
+	  </span>
+	  <br>
+      <input type="range" id="question-freq" min="0" max="100">
+	  <br>
+	  <label for="which-set">
+	    Question set:
+	  </label>
+	  <select id="which-set">
+	    <option value="apush">AP US History</option>
+		<option value="trig">Trigonometry</option>
+	  </select>
     </div>
   </div>
 

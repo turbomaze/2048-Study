@@ -524,6 +524,40 @@ hr {
 
 .game-explanation {
   margin-top: 50px; }
+  
+.below-game {
+	margin-top: 10px;
+}
+label {
+	margin-bottom: 10px;
+}
+input[type=range] {
+	-webkit-appearance: none;
+	background-color: #bbada0;
+	width: 500px;
+	height: 25px;
+	margin: 0px;
+	float: right;
+}
+::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	background-color: #8f7a66;
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+}
+input[type=range]:focus {
+	border-color: rgba(237, 194, 46, 1);
+	box-shadow: 0 0 5px rgba(237, 207, 114, 1);
+	outline: none;
+}
+#freq-description {
+	float: right;
+	margin-bottom: 10px;
+}
+#which-set {
+	margin-top: 10px;
+}
 
 @media screen and (max-width: 520px) {
   html, body {
@@ -743,4 +777,8 @@ hr {
 
   .tile .tile-inner {
     font-size: 35px; }
+  
+  input[type=range] {
+	width: 280px;
+  }
 } /* end of max(520px) media query */

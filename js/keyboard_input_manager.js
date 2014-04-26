@@ -57,15 +57,23 @@ KeyboardInputManager.prototype.listen = function () {
 	var questionOverlay = document.querySelector(".game-message.question");
 
     if (!modifiers) {
-      if (mapped !== undefined) {
-        if (questionOverlay.style.display !== 'block') event.preventDefault();
+	  //wasd, hjkl, and <^v> and the game isn't paused
+      if (mapped !== undefined && questionOverlay.style.display !== 'block') {
+        event.preventDefault();
         self.emit("move", mapped);
       }
     }
 
     // R key restarts the game
-    if (!modifiers && event.which === 82) {
-      if (questionOverlay.style.display !== 'block') self.restart.call(self, event);
+    if (!modifiers && event.which === 82 && questionOverlay.style.display !== 'block') {
+      self.restart.call(self, event);
+    }
+
+	// [enter] key submits the user's answer when...
+    if (!modifiers && event.which === 13 &&
+	    questionOverlay.style.display === 'block' && //they're paused
+		document.activeElement.id === 'answer-to-question') { //and focused on the text input
+      self.submitAnswer();
     }
   });
 
@@ -74,6 +82,9 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
   this.bindButtonPress(".answer-btn", this.submitAnswer);
+  
+  // Respond to the range input
+  this.bindRangeSlide('#question-freq', this.updateRangeMessage);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -140,8 +151,11 @@ KeyboardInputManager.prototype.keepPlaying = function (event) {
 };
 
 KeyboardInputManager.prototype.submitAnswer = function (event) {
-  event.preventDefault();
   this.emit("submitAnswer");
+};
+
+KeyboardInputManager.prototype.updateRangeMessage = function (event) {
+  this.emit("rangeChange");
 };
 
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
@@ -149,3 +163,9 @@ KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   button.addEventListener("click", fn.bind(this));
   button.addEventListener(this.eventTouchend, fn.bind(this));
 };
+
+KeyboardInputManager.prototype.bindRangeSlide = function (selector, fn) {
+  var range = document.querySelector(selector);
+  range.addEventListener("input", fn.bind(this));
+};
+
