@@ -143,7 +143,7 @@ HTMLActuator.prototype.askStudyQuestion = function(GM) {
 	var p = questionContainer.getElementsByTagName("p")[0];
 	
 	var questionAndAns = this.getRandomQandA();
-	GM.currentAnswer = questionAndAns[1];
+	GM.currentAnswers = questionAndAns[1];
 	
 	questionContainer.style.display = 'block';
 	p.textContent = questionAndAns[0];

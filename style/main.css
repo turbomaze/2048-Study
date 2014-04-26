@@ -544,6 +544,7 @@ input[type=range] {
 	background-color: #8f7a66;
 	width: 30px;
 	height: 30px;
+	cursor: pointer;
 }
 input[type=range]:focus {
 	border-color: rgba(237, 194, 46, 1);

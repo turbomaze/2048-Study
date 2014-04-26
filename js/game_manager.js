@@ -6,7 +6,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
   this.startTiles     = 2;
   this.moveCount      = 0;
-  this.currentAnswer  = '';
+  this.currentAnswers = [''];
   this.isPaused       = true;
   this.qFreq          = 30; //out of 300
 
@@ -50,7 +50,7 @@ GameManager.prototype.setup = function () {
     this.won           = previousState.won;
     this.keepPlaying   = previousState.keepPlaying;
 	this.moveCount     = previousState.moveCount;
-	this.currentAnswer = '';
+	this.currentAnswers = [''];
 	this.isPaused      = false;
 	this.qFreq         = previousState.qFreq;
 		document.getElementById('question-freq').value = this.qFreq;
@@ -61,7 +61,7 @@ GameManager.prototype.setup = function () {
     this.won           = false;
     this.keepPlaying   = false;
 	this.moveCount     = 0;
-	this.currentAnswer = '';
+	this.currentAnswers = [''];
 	this.isPaused      = false;
 
     // Add the initial tiles
@@ -106,15 +106,15 @@ GameManager.prototype.actuate = function () {
   }
 
   this.actuator.actuate(this.grid, {
-    score:         this.score,
-    over:          this.over,
-    won:           this.won,
-    bestScore:     this.storageManager.getBestScore(),
-    terminated:    this.isGameTerminated(),
-	moveCount:     this.moveCount,
-	currentAnswer: this.currentAnswer,
-	isPaused:      this.isPaused,
-	qFreq:         this.qFreq
+    score:          this.score,
+    over:           this.over,
+    won:            this.won,
+    bestScore:      this.storageManager.getBestScore(),
+    terminated:     this.isGameTerminated(),
+	moveCount:      this.moveCount,
+	currentAnswers: this.currentAnswers,
+	isPaused:       this.isPaused,
+	qFreq:          this.qFreq
   });
 
 };
@@ -122,15 +122,15 @@ GameManager.prototype.actuate = function () {
 // Represent the current game as an object
 GameManager.prototype.serialize = function () {
   return {
-    grid:          this.grid.serialize(),
-    score:         this.score,
-    over:          this.over,
-    won:           this.won,
-    keepPlaying:   this.keepPlaying,
-	moveCount:     this.moveCount,
-	currentAnswer: this.currentAnswer,
-	isPaused:      this.isPaused,
-	qFreq:         this.qFreq
+    grid:           this.grid.serialize(),
+    score:          this.score,
+    over:           this.over,
+    won:            this.won,
+    keepPlaying:    this.keepPlaying,
+	moveCount:      this.moveCount,
+	currentAnswers: this.currentAnswers,
+	isPaused:       this.isPaused,
+	qFreq:          this.qFreq
   };
 };
 
@@ -317,13 +317,23 @@ GameManager.prototype.mergeTiles = function(a, b) {
 
 GameManager.prototype.processAnswer = function () {
 	var attempt = document.getElementById("answer-to-question").value;
-	if (attempt.toLowerCase() === this.currentAnswer.toLowerCase()) {
+	if (this.answerIsCorrect(attempt, this.currentAnswers)) {
 		document.querySelector(".game-message.question").style.display = 'none';
 		document.getElementById("answer-to-question").value = ''
 		this.isPaused = false; //unpause
 	} else {
 		document.getElementById("answer-to-question").value = ''; //try again
 	}
+};
+
+GameManager.prototype.answerIsCorrect = function(guess, acceptables) {
+	guess = guess.toLowerCase().replace(/\W/g, ''); //remove non-alphanum chars
+	for (var ai = 0; ai < acceptables.length; ai++) {
+		if (guess === acceptables[ai].toLowerCase().replace(/\W/g, '')) {
+			return true; //return true if any match up
+		}
+	}
+	return false; //if none do, then return false
 };
 
 GameManager.prototype.dealWithRange = function() {
