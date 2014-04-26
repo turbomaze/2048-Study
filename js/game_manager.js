@@ -5,6 +5,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.actuator       = new Actuator;
 
   this.startTiles     = 2;
+  this.moveCount      = 0;
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
@@ -43,12 +44,14 @@ GameManager.prototype.setup = function () {
     this.over        = previousState.over;
     this.won         = previousState.won;
     this.keepPlaying = previousState.keepPlaying;
+	this.moveCount   = previousState.moveCount;
   } else {
     this.grid        = new Grid(this.size);
     this.score       = 0;
     this.over        = false;
     this.won         = false;
     this.keepPlaying = false;
+	this.moveCount   = 0;
 
     // Add the initial tiles
     this.addStartTiles();
@@ -93,7 +96,8 @@ GameManager.prototype.actuate = function () {
     over:       this.over,
     won:        this.won,
     bestScore:  this.storageManager.getBestScore(),
-    terminated: this.isGameTerminated()
+    terminated: this.isGameTerminated(),
+	moveCount:  this.moveCount
   });
 
 };
@@ -105,7 +109,8 @@ GameManager.prototype.serialize = function () {
     score:       this.score,
     over:        this.over,
     won:         this.won,
-    keepPlaying: this.keepPlaying
+    keepPlaying: this.keepPlaying,
+	moveCount:   this.moveCount
   };
 };
 
@@ -180,6 +185,7 @@ GameManager.prototype.move = function (direction) {
   });
 
   if (moved) {
+	this.handleStudyPrompt();
     this.addRandomTile();
 
     if (!this.movesAvailable()) {
@@ -188,6 +194,11 @@ GameManager.prototype.move = function (direction) {
 
     this.actuate();
   }
+};
+
+GameManager.prototype.handleStudyPrompt = function() {
+	this.moveCount++;
+	console.log(this.moveCount);
 };
 
 // Get the vector representing the chosen direction
