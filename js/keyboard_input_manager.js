@@ -57,15 +57,15 @@ KeyboardInputManager.prototype.listen = function () {
 	var questionOverlay = document.querySelector(".game-message.question");
 
     if (!modifiers) {
-      if (mapped !== undefined) {
-        if (questionOverlay.style.display !== 'block') event.preventDefault();
+      if (mapped !== undefined && questionOverlay.style.display !== 'block') {
+        event.preventDefault();
         self.emit("move", mapped);
       }
     }
 
     // R key restarts the game
-    if (!modifiers && event.which === 82) {
-      if (questionOverlay.style.display !== 'block') self.restart.call(self, event);
+    if (!modifiers && event.which === 82 && questionOverlay.style.display !== 'block') {
+      self.restart.call(self, event);
     }
   });
 
