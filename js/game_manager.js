@@ -7,6 +7,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.startTiles     = 2;
   this.moveCount      = 0;
   this.currentAnswer  = '';
+  this.isPaused       = true;
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
@@ -48,6 +49,7 @@ GameManager.prototype.setup = function () {
     this.keepPlaying   = previousState.keepPlaying;
 	this.moveCount     = previousState.moveCount;
 	this.currentAnswer = '';
+	this.isPaused      = false;
   } else {
     this.grid        = new Grid(this.size);
     this.score       = 0;
@@ -56,6 +58,7 @@ GameManager.prototype.setup = function () {
     this.keepPlaying = false;
 	this.moveCount   = 0;
 	this.currentAnswer = '';
+	this.isPaused      = false;
 
     // Add the initial tiles
     this.addStartTiles();
@@ -102,7 +105,8 @@ GameManager.prototype.actuate = function () {
     bestScore:     this.storageManager.getBestScore(),
     terminated:    this.isGameTerminated(),
 	moveCount:     this.moveCount,
-	currentAnswer: this.currentAnswer
+	currentAnswer: this.currentAnswer,
+	isPaused:      this.isPaused
   });
 
 };
@@ -116,7 +120,8 @@ GameManager.prototype.serialize = function () {
     won:           this.won,
     keepPlaying:   this.keepPlaying,
 	moveCount:     this.moveCount,
-	currentAnswer: this.currentAnswer
+	currentAnswer: this.currentAnswer,
+	isPaused:      this.isPaused
   };
 };
 
@@ -141,8 +146,10 @@ GameManager.prototype.moveTile = function (tile, cell) {
 GameManager.prototype.move = function (direction) {
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
-
-  if (this.isGameTerminated()) return; // Don't do anything if the game's over
+console.log(this.isPaused);
+  if (this.isGameTerminated() || this.isPaused) {
+	return; // Don't do anything if the game's over
+  }
 
   var cell, tile;
 
@@ -172,6 +179,7 @@ GameManager.prototype.move = function (direction) {
           self.grid.removeTile(tile);
 		  
 		  if (next.value === 0 || tile.value === 0) { //special tile
+			self.isPaused = true; //pause the game
 			//100ms delay for the CSS animation
 			setTimeout(function() {
 				self.actuator.askStudyQuestion(self);
@@ -303,7 +311,7 @@ GameManager.prototype.processAnswer = function () {
   if (attempt === this.currentAnswer) {
 	document.querySelector(".game-message.question").style.display = 'none';
 	document.getElementById("answer-to-question").value = ''
-	//unpause
+	this.isPaused = false; //unpause
   } else {
 	document.getElementById("answer-to-question").value = ''; //try again
   }
