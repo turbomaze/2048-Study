@@ -7,8 +7,6 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.startTiles     = 2;
   this.moveCount      = 0;
   this.currentAnswers = [''];
-  this.isPaused       = true;
-  this.qFreq          = 30; //out of 300
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
@@ -16,6 +14,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("submitAnswer", this.processAnswer.bind(this));
   this.inputManager.on("rangeChange", this.dealWithRange.bind(this));
 
+  this.dealWithRange();
   this.setup();
 }
 
@@ -45,24 +44,30 @@ GameManager.prototype.setup = function () {
   if (previousState) {
     this.grid        = new Grid(previousState.grid.size,
                                 previousState.grid.cells); // Reload grid
-    this.score         = previousState.score;
-    this.over          = previousState.over;
-    this.won           = previousState.won;
-    this.keepPlaying   = previousState.keepPlaying;
-	this.moveCount     = previousState.moveCount;
+    this.score          = previousState.score;
+    this.over           = previousState.over;
+    this.won            = previousState.won;
+    this.keepPlaying    = previousState.keepPlaying;
+	this.moveCount      = previousState.moveCount;
 	this.currentAnswers = [''];
-	this.isPaused      = false;
-	this.qFreq         = previousState.qFreq;
+	this.isPaused       = false;
+	this.qFreq          = previousState.qFreq;
 		document.getElementById('question-freq').value = this.qFreq;
+		this.dealWithRange();
+		console.log('a',document.getElementById('question-freq').value,this.qFreq);
   } else {
-    this.grid          = new Grid(this.size);
-    this.score         = 0;
-    this.over          = false;
-    this.won           = false;
-    this.keepPlaying   = false;
-	this.moveCount     = 0;
+    this.grid           = new Grid(this.size);
+    this.score          = 0;
+    this.over           = false;
+    this.won            = false;
+    this.keepPlaying    = false;
+	this.moveCount      = 0;
 	this.currentAnswers = [''];
-	this.isPaused      = false;
+	this.isPaused       = false;
+	this.qFreq          = 30; //out of 300
+		document.getElementById('question-freq').value = this.qFreq;
+		this.dealWithRange();
+		console.log('b',document.getElementById('question-freq').value,this.qFreq);
 
     // Add the initial tiles
     this.addStartTiles();
