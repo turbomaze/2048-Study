@@ -172,15 +172,34 @@ hr {
     -webkit-animation-fill-mode: both;
     -moz-animation-fill-mode: both;
     animation-fill-mode: both; }
+  .game-container .game-message.question {
+    background: rgba(238, 228, 218, 0.75);
+    -webkit-animation: fade-in 500ms;
+    -moz-animation: fade-in 500ms;
+    animation: fade-in 500ms;
+    -webkit-animation-fill-mode: both;
+    -moz-animation-fill-mode: both;
+    animation-fill-mode: both; }
     .game-container .game-message p {
       font-size: 60px;
       font-weight: bold;
       height: 60px;
       line-height: 60px;
       margin-top: 222px; }
+	.game-container .game-message.question p {
+	  width: 450px;
+	  margin-left: 25px;
+      font-size: 28px;
+      font-weight: bold;
+      height: auto;
+      line-height: 28px;
+      margin-top: 150px; }
     .game-container .game-message .lower {
       display: block;
       margin-top: 59px; }
+	.game-container .game-message.question .lower {
+      display: block;
+      margin-top: 11px; }
     .game-container .game-message a {
       display: inline-block;
       background: #8f7a66;
@@ -578,15 +597,34 @@ hr {
       -webkit-animation-fill-mode: both;
       -moz-animation-fill-mode: both;
       animation-fill-mode: both; }
+	.game-container .game-message.question {
+	  background: rgba(238, 228, 218, 0.75);
+      -webkit-animation: fade-in 500ms;
+      -moz-animation: fade-in 500ms;
+      animation: fade-in 500ms;
+      -webkit-animation-fill-mode: both;
+      -moz-animation-fill-mode: both;
+      animation-fill-mode: both; }
       .game-container .game-message p {
-        font-size: 60px;
+        font-size: 30px;
         font-weight: bold;
-        height: 60px;
-        line-height: 60px;
-        margin-top: 222px; }
+        height: 30px;
+        line-height: 30px;
+        margin-top: 90px; }
+	  .game-container .game-message.question p {
+	    width: 250px;
+		margin-left: 15px;
+        font-size: 15px;
+        font-weight: bold;
+        height: auto;
+        line-height: 15px;
+        margin-top: 50px; }
       .game-container .game-message .lower {
         display: block;
-        margin-top: 59px; }
+        margin-top: 30px; }
+	  .game-container .game-message.question .lower {
+        display: block;
+        margin-top: 11px; }
       .game-container .game-message a {
         display: inline-block;
         background: #8f7a66;
@@ -705,11 +743,4 @@ hr {
 
   .tile .tile-inner {
     font-size: 35px; }
-
-  .game-message p {
-    font-size: 30px !important;
-    height: 30px !important;
-    line-height: 30px !important;
-    margin-top: 90px !important; }
-  .game-message .lower {
-    margin-top: 30px !important; } }
+} /* end of max(520px) media query */

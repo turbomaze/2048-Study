@@ -71,7 +71,7 @@ GameManager.prototype.addStartTiles = function () {
 // Adds a tile in a random position
 GameManager.prototype.addRandomTile = function () {
   if (this.grid.cellsAvailable()) {
-    var value = Math.random() < 0.9 ? 2 : 0; //0 means it's a study question
+    var value = Math.random() < 0.75 ? 2 : 0; //0 means it's a study question
     var tile = new Tile(this.grid.randomAvailableCell(), value);
 
     this.grid.insertTile(tile);
@@ -166,7 +166,9 @@ GameManager.prototype.move = function (direction) {
           self.grid.removeTile(tile);
 		  
 		  if (next.value === 0 || tile.value === 0) { //special tile
-			setTimeout(self.actuator.askStudyQuestion, 100); //100ms delay for the CSS animation
+			(function (a) {
+				setTimeout(a.actuator.askStudyQuestion, 100);
+			})(self); //100ms delay for the CSS animation
 		  }
 
           // Converge the two tiles' positions

@@ -1,8 +1,8 @@
 function HTMLActuator() {
-  this.tileContainer    = document.querySelector(".tile-container");
-  this.scoreContainer   = document.querySelector(".score-container");
-  this.bestContainer    = document.querySelector(".best-container");
-  this.messageContainer = document.querySelector(".game-message");
+  this.tileContainer     = document.querySelector(".tile-container");
+  this.scoreContainer    = document.querySelector(".score-container");
+  this.bestContainer     = document.querySelector(".best-container");
+  this.messageContainer  = document.querySelector(".game-message.core");
 
   this.score = 0;
 }
@@ -139,6 +139,10 @@ HTMLActuator.prototype.clearMessage = function () {
 };
 
 HTMLActuator.prototype.askStudyQuestion = function() {
-	var foo = prompt("Name one author of the declaration of independence.");
-	if (foo !== 'foo') console.log('u suk');
+	//var foo = prompt("Name one author of the declaration of independence.");
+	//if (foo !== 'foo') console.log('u suk');
+	var questionContainer = document.querySelector(".game-message.question");
+	questionContainer.getElementsByTagName("p")[0].textContent = 
+		'Who wrote the dec ind?Who wrote the dec ind?Who wrote the dec ind?Who wrote the dec ind?Who wrote the dec ic ind?';
+	questionContainer.style.display = 'block';
 };
