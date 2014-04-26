@@ -82,6 +82,9 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
   this.bindButtonPress(".answer-btn", this.submitAnswer);
+  
+  // Respond to the range input
+  this.bindRangeSlide('#question-freq', this.updateRangeMessage);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -151,8 +154,18 @@ KeyboardInputManager.prototype.submitAnswer = function (event) {
   this.emit("submitAnswer");
 };
 
+KeyboardInputManager.prototype.updateRangeMessage = function (event) {
+  this.emit("rangeChange");
+};
+
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);
   button.addEventListener("click", fn.bind(this));
   button.addEventListener(this.eventTouchend, fn.bind(this));
 };
+
+KeyboardInputManager.prototype.bindRangeSlide = function (selector, fn) {
+  var range = document.querySelector(selector);
+  range.addEventListener("input", fn.bind(this));
+};
+
