@@ -6,10 +6,12 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
   this.startTiles     = 2;
   this.moveCount      = 0;
+  this.currentAnswer  = '';
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+  this.inputManager.on("submitAnswer", this.processAnswer.bind(this));
 
   this.setup();
 }
@@ -40,11 +42,12 @@ GameManager.prototype.setup = function () {
   if (previousState) {
     this.grid        = new Grid(previousState.grid.size,
                                 previousState.grid.cells); // Reload grid
-    this.score       = previousState.score;
-    this.over        = previousState.over;
-    this.won         = previousState.won;
-    this.keepPlaying = previousState.keepPlaying;
-	this.moveCount   = previousState.moveCount;
+    this.score         = previousState.score;
+    this.over          = previousState.over;
+    this.won           = previousState.won;
+    this.keepPlaying   = previousState.keepPlaying;
+	this.moveCount     = previousState.moveCount;
+	this.currentAnswer = '';
   } else {
     this.grid        = new Grid(this.size);
     this.score       = 0;
@@ -52,6 +55,7 @@ GameManager.prototype.setup = function () {
     this.won         = false;
     this.keepPlaying = false;
 	this.moveCount   = 0;
+	this.currentAnswer = '';
 
     // Add the initial tiles
     this.addStartTiles();
@@ -92,12 +96,13 @@ GameManager.prototype.actuate = function () {
   }
 
   this.actuator.actuate(this.grid, {
-    score:      this.score,
-    over:       this.over,
-    won:        this.won,
-    bestScore:  this.storageManager.getBestScore(),
-    terminated: this.isGameTerminated(),
-	moveCount:  this.moveCount
+    score:         this.score,
+    over:          this.over,
+    won:           this.won,
+    bestScore:     this.storageManager.getBestScore(),
+    terminated:    this.isGameTerminated(),
+	moveCount:     this.moveCount,
+	currentAnswer: this.currentAnswer
   });
 
 };
@@ -105,12 +110,13 @@ GameManager.prototype.actuate = function () {
 // Represent the current game as an object
 GameManager.prototype.serialize = function () {
   return {
-    grid:        this.grid.serialize(),
-    score:       this.score,
-    over:        this.over,
-    won:         this.won,
-    keepPlaying: this.keepPlaying,
-	moveCount:   this.moveCount
+    grid:          this.grid.serialize(),
+    score:         this.score,
+    over:          this.over,
+    won:           this.won,
+    keepPlaying:   this.keepPlaying,
+	moveCount:     this.moveCount,
+	currentAnswer: this.currentAnswer
   };
 };
 
@@ -166,9 +172,10 @@ GameManager.prototype.move = function (direction) {
           self.grid.removeTile(tile);
 		  
 		  if (next.value === 0 || tile.value === 0) { //special tile
-			(function (a) {
-				setTimeout(a.actuator.askStudyQuestion, 100);
-			})(self); //100ms delay for the CSS animation
+			//100ms delay for the CSS animation
+			setTimeout(function() {
+				self.actuator.askStudyQuestion(self);
+			}, 100);
 		  }
 
           // Converge the two tiles' positions
@@ -191,6 +198,7 @@ GameManager.prototype.move = function (direction) {
   });
 
   if (moved) {
+	this.moveCount++;
     this.addRandomTile();
 
     if (!this.movesAvailable()) {
@@ -288,4 +296,15 @@ GameManager.prototype.valuesCanMerge = function(a, b) {
 
 GameManager.prototype.mergeTiles = function(a, b) {
 	return a+b;
+};
+
+GameManager.prototype.processAnswer = function () {
+  var attempt = document.getElementById("answer-to-question").value;
+  if (attempt === this.currentAnswer) {
+	document.querySelector(".game-message.question").style.display = 'none';
+	document.getElementById("answer-to-question").value = ''
+	//unpause
+  } else {
+	document.getElementById("answer-to-question").value = ''; //try again
+  }
 };

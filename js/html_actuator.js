@@ -138,11 +138,18 @@ HTMLActuator.prototype.clearMessage = function () {
   this.messageContainer.classList.remove("game-over");
 };
 
-HTMLActuator.prototype.askStudyQuestion = function() {
-	//var foo = prompt("Name one author of the declaration of independence.");
-	//if (foo !== 'foo') console.log('u suk');
+HTMLActuator.prototype.askStudyQuestion = function(GM) {
 	var questionContainer = document.querySelector(".game-message.question");
-	questionContainer.getElementsByTagName("p")[0].textContent = 
-		'Who wrote the dec ind?Who wrote the dec ind?Who wrote the dec ind?Who wrote the dec ind?Who wrote the dec ic ind?';
+	var p = questionContainer.getElementsByTagName("p")[0];
+	
+	var questionAndAns = this.getRandomQandA();
+	GM.currentAnswer = questionAndAns[1];
+	
 	questionContainer.style.display = 'block';
+	p.textContent = questionAndAns[0];
+};
+
+HTMLActuator.prototype.getRandomQandA = function() {
+	return ["Who wrote the dec ind?Who wrote the dec ind?"+
+	"ho wrote the dec ind?Who wrote the dec ind?Who wrote the dec ic ind?", "swag"];
 };
