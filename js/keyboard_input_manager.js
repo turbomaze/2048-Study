@@ -75,6 +75,11 @@ KeyboardInputManager.prototype.listen = function () {
 		document.activeElement.id === 'answer-to-question') { //and focused on the text input
       self.submitAnswer();
     }
+	
+	// any keypress focuses the text input if the game is paused
+	if (questionOverlay.style.display === 'block') {
+      document.getElementById('answer-to-question').focus(true);
+    }
   });
 
   // Respond to button presses

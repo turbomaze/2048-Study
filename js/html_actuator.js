@@ -147,9 +147,6 @@ HTMLActuator.prototype.askStudyQuestion = function(GM) {
 	
 	questionContainer.style.display = 'block';
 	p.textContent = questionAndAns[0];
-	setTimeout(function() {
-		document.getElementById('answer-to-question').focus(true);
-	}, 500);
 };
 
 HTMLActuator.prototype.getRandomQandA = function() {
