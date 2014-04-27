@@ -20,6 +20,10 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
 // Restart the game
 GameManager.prototype.restart = function () {
+  document.querySelector(".game-message.question").style.display = 'none';
+  document.getElementById("answer-to-question").value = '';
+  this.isPaused = false; //unpause
+  
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
@@ -350,9 +354,9 @@ GameManager.prototype.dealWithRange = function() {
 	} else {
 		var msgs = [
 			'noob casual',
-			'one in ten blocks',
+			'one in ten tiles',
 			'uh-oh gettin\' serious',
-			'one in four blocks',
+			'one in four tiles',
 			'CRAM LEVEL 9000',
 		];
 		var idx = Math.min(Math.floor((newFreq/100)*msgs.length), msgs.length-1);
