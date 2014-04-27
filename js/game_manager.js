@@ -76,6 +76,7 @@ GameManager.prototype.setup = function () {
 	this.qFreq          = 30; //out of 300
 		document.getElementById('question-freq').value = this.qFreq;
 		this.dealWithRange();
+	this.quizletQuandas = this.quizletQuandas || [];
 	this.noNewGameBtn   = false;
 
     // Add the initial tiles
