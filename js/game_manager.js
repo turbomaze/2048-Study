@@ -422,7 +422,7 @@ GameManager.prototype.dealWithQuizletURL = function() {
 						var card = flashcards[ai];
 						GM.quizletQuandas.push([
 							card['definition'],
-							[card['term']]
+							card['term'].split('; ')
 						]);
 					}
 				}
