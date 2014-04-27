@@ -22,6 +22,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
 // Restart the game
 GameManager.prototype.restart = function () {
+  if (this.noNewGameBtn) return;
+
   document.querySelector(".game-message.question").style.display = 'none';
   document.getElementById("answer-to-question").value = '';
   this.isPaused = false; //unpause
@@ -61,6 +63,7 @@ GameManager.prototype.setup = function () {
 		document.getElementById('question-freq').value = this.qFreq;
 		this.dealWithRange();
 	this.quizletQuandas = [];
+	this.noNewGameBtn   = false;
   } else {
     this.grid           = new Grid(this.size);
     this.score          = 0;
@@ -73,6 +76,7 @@ GameManager.prototype.setup = function () {
 	this.qFreq          = 30; //out of 300
 		document.getElementById('question-freq').value = this.qFreq;
 		this.dealWithRange();
+	this.noNewGameBtn   = false;
 
     // Add the initial tiles
     this.addStartTiles();
@@ -125,7 +129,8 @@ GameManager.prototype.actuate = function () {
 	currentAnswers: this.currentAnswers,
 	isPaused:       this.isPaused,
 	qFreq:          this.qFreq,
-	quizletQuandas: this.quizletQuandas
+	quizletQuandas: this.quizletQuandas,
+	noNewGameBtn:   this.noNewGameBtn
   });
 
 };
@@ -142,7 +147,8 @@ GameManager.prototype.serialize = function () {
 	currentAnswers: this.currentAnswers,
 	isPaused:       this.isPaused,
 	qFreq:          this.qFreq,
-	quizletQuandas: this.quizletQuandas
+	quizletQuandas: this.quizletQuandas,
+	noNewGameBtn:   this.noNewGameBtn
   };
 };
 
@@ -379,14 +385,18 @@ GameManager.prototype.dealWithSelect = function() {
 		if (this.quizletQuandas.length === 0) {
 			//pause the game so they don't mess anything up
 			this.isPaused = true;
+			this.noNewGameBtn = true;
 			document.querySelector(".game-message.overlay").style.display = 'block';
+			document.querySelector(".restart-button").style.color = 'rgba(238, 228, 218, 0.35)';
 		}
 	} else {
 		//could be abused to escape questioning, but it's cool
 		//because keyboard inputs are frozen on question screens anyway
 		this.isPaused = false;
+		this.noNewGameBtn = false;
 		document.getElementById('quizlet-form').style.display = 'none';
 		document.querySelector(".game-message.overlay").style.display = 'none';
+		document.querySelector(".restart-button").style.color = '#f9f6f2';
 	}
 };
 
@@ -398,7 +408,12 @@ GameManager.prototype.dealWithQuizletURL = function() {
 	var url = document.getElementById('quizlet-url').value;
 	var corsProxy = "http://jsonp.jit.su/?url=";
 	var apiPrefix = 'https://api.quizlet.com/2.0/sets/';
-	var id = url.match(/quizlet\.com\/([\d]+)\//)[1];
+	var id = url.match(/quizlet\.com\/([\d]+)\//);
+		if (!id || id.length < 2) {
+			document.getElementById('quizlet-url').value = 'Error loading page.';
+			return;
+		}
+		id = id[1];
 	var apiSuffix = '?client_id=TkzaAdKbZ2&whitespace=1';
 	var requestURL = corsProxy+apiPrefix+id+apiSuffix;
 
@@ -425,11 +440,13 @@ GameManager.prototype.dealWithQuizletURL = function() {
 							card['term'].split('; ')
 						]);
 					}
+					
+					//unpause the game
+					GM.isPaused = false;
+					GM.noNewGameBtn = false;
+					document.querySelector(".game-message.overlay").style.display = 'none';
+					document.querySelector(".restart-button").style.color = '#f9f6f2';
 				}
-				
-				//unpause the game
-				GM.isPaused = false;
-				document.querySelector(".game-message.overlay").style.display = 'none';
 			}
 		}
 	)(self));
