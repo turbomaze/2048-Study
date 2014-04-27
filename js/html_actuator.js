@@ -141,20 +141,31 @@ HTMLActuator.prototype.clearMessage = function () {
 HTMLActuator.prototype.askStudyQuestion = function(GM) {
 	var questionContainer = document.querySelector(".game-message.question");
 	var p = questionContainer.getElementsByTagName("p")[0];
+	var select = document.getElementById('which-set');
+	var url = document.getElementById('quizlet-url');
+	var btn = document.getElementById('quizlet-btn');
 	
-	var questionAndAns = this.getRandomQandA();
+	var questionAndAns = this.getRandomQandA(GM);
 	GM.currentAnswers = questionAndAns[1];
 	
-	questionContainer.style.display = 'block';
-	p.textContent = questionAndAns[0];
+	questionContainer.style.display = 'block'; //show the overlay
+	p.textContent = questionAndAns[0]; //add the question
+	select.disabled = true;
+	url.disabled = true;
+	btn.disabled = true;
 };
 
-HTMLActuator.prototype.getRandomQandA = function() {
+HTMLActuator.prototype.getRandomQandA = function(GM) {
 	function getRandInt(low, high) { //output is in [low, high)
 		return Math.floor(low + Math.random()*(high-low));
 	}
 
 	var set = document.getElementById('which-set').value;
-	var idx = getRandInt(0, QuestionData[set].length);
-	return QuestionData[set][idx];
+	if (set === 'quizlet') {
+		var idx = getRandInt(0, GM.quizletQuandas.length);
+		return GM.quizletQuandas[idx];
+	} else {
+		var idx = getRandInt(0, QuestionData[set].length);
+		return QuestionData[set][idx];
+	}
 };

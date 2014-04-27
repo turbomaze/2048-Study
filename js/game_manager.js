@@ -13,6 +13,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
   this.inputManager.on("submitAnswer", this.processAnswer.bind(this));
   this.inputManager.on("rangeChange", this.dealWithRange.bind(this));
+  this.inputManager.on("selectChange", this.dealWithSelect.bind(this));
+  this.inputManager.on("quizletURLSubmit", this.dealWithQuizletURL.bind(this));
 
   this.dealWithRange();
   this.setup();
@@ -53,12 +55,12 @@ GameManager.prototype.setup = function () {
     this.won            = previousState.won;
     this.keepPlaying    = previousState.keepPlaying;
 	this.moveCount      = previousState.moveCount;
-	this.currentAnswers = [''];
+	this.currentAnswers = [];
 	this.isPaused       = false;
 	this.qFreq          = previousState.qFreq;
 		document.getElementById('question-freq').value = this.qFreq;
 		this.dealWithRange();
-		console.log('a',document.getElementById('question-freq').value,this.qFreq);
+	this.quizletQuandas = [];
   } else {
     this.grid           = new Grid(this.size);
     this.score          = 0;
@@ -66,12 +68,11 @@ GameManager.prototype.setup = function () {
     this.won            = false;
     this.keepPlaying    = false;
 	this.moveCount      = 0;
-	this.currentAnswers = [''];
+	this.currentAnswers = [];
 	this.isPaused       = false;
 	this.qFreq          = 30; //out of 300
 		document.getElementById('question-freq').value = this.qFreq;
 		this.dealWithRange();
-		console.log('b',document.getElementById('question-freq').value,this.qFreq);
 
     // Add the initial tiles
     this.addStartTiles();
@@ -123,7 +124,8 @@ GameManager.prototype.actuate = function () {
 	moveCount:      this.moveCount,
 	currentAnswers: this.currentAnswers,
 	isPaused:       this.isPaused,
-	qFreq:          this.qFreq
+	qFreq:          this.qFreq,
+	quizletQuandas: this.quizletQuandas
   });
 
 };
@@ -139,7 +141,8 @@ GameManager.prototype.serialize = function () {
 	moveCount:      this.moveCount,
 	currentAnswers: this.currentAnswers,
 	isPaused:       this.isPaused,
-	qFreq:          this.qFreq
+	qFreq:          this.qFreq,
+	quizletQuandas: this.quizletQuandas
   };
 };
 
@@ -327,8 +330,12 @@ GameManager.prototype.mergeTiles = function(a, b) {
 GameManager.prototype.processAnswer = function () {
 	var attempt = document.getElementById("answer-to-question").value;
 	if (this.answerIsCorrect(attempt, this.currentAnswers)) {
+		//remove the overlay
 		document.querySelector(".game-message.question").style.display = 'none';
-		document.getElementById("answer-to-question").value = ''
+		document.getElementById("answer-to-question").value = ''; //remove the ?
+		document.getElementById('which-set').disabled = false; //enable it again
+		document.getElementById('quizlet-url').disabled = false;
+		document.getElementById('quizlet-btn').disabled = false;
 		this.isPaused = false; //unpause
 	} else {
 		document.getElementById("answer-to-question").value = ''; //try again
@@ -363,4 +370,67 @@ GameManager.prototype.dealWithRange = function() {
 		freqComment.innerHTML = msgs[idx];
 	}
 	this.qFreq = newFreq;
+};
+
+GameManager.prototype.dealWithSelect = function() {
+	var select = document.getElementById('which-set');
+	if (select.value === 'quizlet') {
+		document.getElementById('quizlet-form').style.display = 'inline';
+		if (this.quizletQuandas.length === 0) {
+			//pause the game so they don't mess anything up
+			this.isPaused = true;
+			document.querySelector(".game-message.overlay").style.display = 'block';
+		}
+	} else {
+		//could be abused to escape questioning, but it's cool
+		//because keyboard inputs are frozen on question screens anyway
+		this.isPaused = false;
+		document.getElementById('quizlet-form').style.display = 'none';
+		document.querySelector(".game-message.overlay").style.display = 'none';
+	}
+};
+
+GameManager.prototype.dealWithQuizletURL = function() {
+	//pause the game so they don't mess anything up
+	this.isPaused = true;
+	document.querySelector(".game-message.overlay").style.display = 'block';
+	
+	var url = document.getElementById('quizlet-url').value;
+	var corsProxy = "http://jsonp.jit.su/?url=";
+	var apiPrefix = 'https://api.quizlet.com/2.0/sets/';
+	var id = url.match(/quizlet\.com\/([\d]+)\//)[1];
+	var apiSuffix = '?client_id=TkzaAdKbZ2&whitespace=1';
+	var requestURL = corsProxy+apiPrefix+id+apiSuffix;
+
+	var self = this;
+	AJAXHelper.makeCorsRequest(requestURL, (
+		//function builder to give the actual callback the GameManager
+		function(GM) {
+			//the actual callback
+			return function(data) {
+				if (data === false) { //only false if there's an error
+					document.getElementById('quizlet-url').value = 'Error loading page.';
+				} else {
+					//deserialize the JSON object
+					var obj = null;
+					eval('obj='+data);
+					
+					//put the good bits of obj in this.quizletQuandas
+					var flashcards = obj['terms'];
+					GM.quizletQuandas = [];
+					for (var ai = 0; ai < flashcards.length; ai++) {
+						var card = flashcards[ai];
+						GM.quizletQuandas.push([
+							card['definition'],
+							card['term'].split('; ')
+						]);
+					}
+				}
+				
+				//unpause the game
+				GM.isPaused = false;
+				document.querySelector(".game-message.overlay").style.display = 'none';
+			}
+		}
+	)(self));
 };
