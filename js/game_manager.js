@@ -407,7 +407,6 @@ GameManager.prototype.dealWithQuizletURL = function() {
 	document.querySelector(".game-message.overlay").style.display = 'block';
 	
 	var url = document.getElementById('quizlet-url').value;
-	var corsProxy = "http://jsonp.jit.su/?url=";
 	var apiPrefix = 'https://api.quizlet.com/2.0/sets/';
 	var id = url.match(/quizlet\.com\/([\d]+)\//);
 		if (!id || id.length < 2) {
@@ -415,40 +414,37 @@ GameManager.prototype.dealWithQuizletURL = function() {
 			return;
 		}
 		id = id[1];
-	var apiSuffix = '?client_id=TkzaAdKbZ2&whitespace=1';
-	var requestURL = corsProxy+apiPrefix+id+apiSuffix;
+	var apiSuffix = '?client_id=TkzaAdKbZ2&callback=global_GM.receiveCORSRequest';
+	var requestURL = apiPrefix+id+apiSuffix;
 
 	var self = this;
-	AJAXHelper.makeCorsRequest(requestURL, (
-		//function builder to give the actual callback the GameManager
-		function(GM) {
-			//the actual callback
-			return function(data) {
-				if (data === false) { //only false if there's an error
-					document.getElementById('quizlet-url').value = 'Error loading page.';
-				} else {
-					//deserialize the JSON object
-					var obj = null;
-					eval('obj='+data);
-					
-					//put the good bits of obj in this.quizletQuandas
-					var flashcards = obj['terms'];
-					GM.quizletQuandas = [];
-					for (var ai = 0; ai < flashcards.length; ai++) {
-						var card = flashcards[ai];
-						GM.quizletQuandas.push([
-							card['definition'],
-							card['term'].split('; ')
-						]);
-					}
-					
-					//unpause the game
-					GM.isPaused = false;
-					GM.noNewGameBtn = false;
-					document.querySelector(".game-message.overlay").style.display = 'none';
-					document.querySelector(".restart-button").style.color = '#f9f6f2';
-				}
-			}
+	AJAXHelper.sendCORSRequest(requestURL);
+};
+
+GameManager.prototype.receiveCORSRequest = function(obj) {
+	if (!obj) { //only false if there's an error
+		document.getElementById('quizlet-url').value = 'Error loading page.';
+	} else {
+		//put the good bits of obj in this.quizletQuandas
+		var flashcards = obj['terms'];
+		this.quizletQuandas = [];
+		for (var ai = 0; ai < flashcards.length; ai++) {
+			var card = flashcards[ai];
+			this.quizletQuandas.push([
+				card['definition'],
+				card['term'].split('; ')
+			]);
 		}
-	)(self));
+		
+		//unpause the game
+		this.isPaused = false;
+		this.noNewGameBtn = false;
+		document.querySelector(".game-message.overlay").style.display = 'none';
+		document.querySelector(".restart-button").style.color = '#f9f6f2';
+		
+		//remove the script element used to carry out the request
+		var scr = document.getElementById('jsonp-cors');
+		var parent = scr.parentNode;
+		parent.removeChild(scr);
+	}
 };
