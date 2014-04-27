@@ -46,8 +46,12 @@
         <p></p>
         <div class="lower">
 	      <input type="text" id="answer-to-question">
-		  <a class="answer-btn">Answer</a>
+		  <a class="answer-btn">Submit</a>
         </div>
+      </div>
+	  
+	  <div class="game-message overlay">
+        
       </div>
 
       <div class="grid-container">
@@ -84,7 +88,7 @@
 	
 	<div class="below-game">
 	  <label for="question-freq">
-	    ? frequency:
+	    ??? frequency:
 	  </label>
 	  <span id="freq-description">
 		That's not even studying
@@ -93,12 +97,17 @@
       <input type="range" id="question-freq" min="0" max="100">
 	  <br>
 	  <label for="which-set">
-	    Question set:
+	    Questions:
 	  </label>
 	  <select id="which-set">
 	    <option value="apush">AP US History</option>
 		<option value="trig">Trigonometry</option>
+		<option value="quizlet">Quizlet URL</option>
 	  </select>
+	  <span id="quizlet-form" style="display: none;">
+		<input type="text" id="quizlet-url" placeholder="Enter the URL">
+		<input type="button" id="quizlet-btn" value="Go">
+	  </span>
     </div>
   </div>
 
@@ -112,5 +121,6 @@
   <script src="js/local_storage_manager.js"></script>
   <script src="js/game_manager.js"></script>
   <script src="js/application.js"></script>
+  <script src="js/ajax.js"></script>
 </body>
 </html>

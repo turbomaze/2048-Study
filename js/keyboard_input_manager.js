@@ -64,11 +64,6 @@ KeyboardInputManager.prototype.listen = function () {
       }
     }
 
-    // R key restarts the game
-    if (!modifiers && event.which === 82 && questionOverlay.style.display !== 'block') {
-      self.restart.call(self, event);
-    }
-
 	// [enter] key submits the user's answer when...
     if (!modifiers && event.which === 13 &&
 	    questionOverlay.style.display === 'block' && //they're paused
@@ -87,9 +82,13 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
   this.bindButtonPress(".answer-btn", this.submitAnswer);
+  this.bindButtonPress("#quizlet-btn", this.handleQuizletURL);
   
   // Respond to the range input
   this.bindRangeSlide('#question-freq', this.updateRangeMessage);
+  
+  // Deal with a changing flashcard set
+  this.bindSelectChange('#which-set', this.updateSelect);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -163,6 +162,14 @@ KeyboardInputManager.prototype.updateRangeMessage = function (event) {
   this.emit("rangeChange");
 };
 
+KeyboardInputManager.prototype.updateSelect = function (event) {
+  this.emit("selectChange");
+};
+
+KeyboardInputManager.prototype.handleQuizletURL = function (event) {
+  this.emit("quizletURLSubmit");
+};
+
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);
   button.addEventListener("click", fn.bind(this));
@@ -172,5 +179,10 @@ KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
 KeyboardInputManager.prototype.bindRangeSlide = function (selector, fn) {
   var range = document.querySelector(selector);
   range.addEventListener("input", fn.bind(this));
+};
+
+KeyboardInputManager.prototype.bindSelectChange = function (selector, fn) {
+  var select = document.querySelector(selector);
+  select.addEventListener("change", fn.bind(this));
 };
 
