@@ -26,6 +26,9 @@ GameManager.prototype.restart = function () {
 
   document.querySelector(".game-message.question").style.display = 'none';
   document.getElementById("answer-to-question").value = '';
+  document.getElementById('which-set').disabled = false; //enable it again
+  document.getElementById('quizlet-url').disabled = false;
+  document.getElementById('quizlet-btn').disabled = false;
   this.isPaused = false; //unpause
   
   this.storageManager.clearGameState();
