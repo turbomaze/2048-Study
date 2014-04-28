@@ -108,15 +108,19 @@ KeyboardInputManager.prototype.listen = function () {
       touchStartClientY = event.touches[0].clientY;
     }
 
-    event.preventDefault();
+	/* not sure what the point of canceling the default behavior is, but
+	   it's impossible for mobile phones to focus on the "answer" text input
+	   if this following line is executed
+	*/
+	//event.preventDefault();
   });
 
   gameContainer.addEventListener(this.eventTouchmove, function (event) {
-    event.preventDefault();
+	event.preventDefault();
   });
 
   gameContainer.addEventListener(this.eventTouchend, function (event) {
-    if ((!window.navigator.msPointerEnabled && event.touches.length > 0) ||
+	if ((!window.navigator.msPointerEnabled && event.touches.length > 0) ||
         event.targetTouches > 0) {
       return; // Ignore if still touching with one or more fingers
     }

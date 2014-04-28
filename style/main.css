@@ -581,6 +581,17 @@ input[type=range]:focus {
 #quizlet-form input[type="button"] {
 	width: 25px;
 }
+input#answer-to-question {
+	height: 29px;
+	border-radius: 4px;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	background: #FDFDFB;
+	color: #776e65;
+	padding: 0px 4px;
+}
+
+
+
 
 @media screen and (max-width: 520px) {
   html, body {
