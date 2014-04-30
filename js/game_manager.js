@@ -414,6 +414,7 @@ GameManager.prototype.dealWithQuizletURL = function() {
 	var id = url.match(/quizlet\.com\/([\d]+)\//);
 		if (!id || id.length < 2) {
 			document.getElementById('quizlet-url').value = 'Error loading page.';
+			ga('send', 'event', 'button', 'click', 'quizlet go', 0); //0 means parse error
 			return;
 		}
 		id = id[1];
@@ -428,6 +429,7 @@ GameManager.prototype.receiveCORSRequest = function(obj) {
 	//false if obj is totally bogus or if Quizlet returned an improper flashcard obj
 	if (!obj || obj.hasOwnProperty('error') || !obj.hasOwnProperty('terms')) {
 		document.getElementById('quizlet-url').value = 'Error loading page.';
+		ga('send', 'event', 'button', 'click', 'quizlet go', 1); //1 means load error
 	} else {
 		//put the good bits of obj in this.quizletQuandas
 		var flashcards = obj['terms'];		
@@ -450,5 +452,7 @@ GameManager.prototype.receiveCORSRequest = function(obj) {
 		var scr = document.getElementById('jsonp-cors');
 		var parent = scr.parentNode;
 		parent.removeChild(scr);
+		
+		ga('send', 'event', 'button', 'click', 'quizlet go', obj['id']); //send the id
 	}
 };
