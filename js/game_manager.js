@@ -425,11 +425,12 @@ GameManager.prototype.dealWithQuizletURL = function() {
 };
 
 GameManager.prototype.receiveCORSRequest = function(obj) {
-	if (!obj) { //only false if there's an error
+	//false if obj is totally bogus or if Quizlet returned an improper flashcard obj
+	if (!obj || obj.hasOwnProperty('error') || !obj.hasOwnProperty('terms')) {
 		document.getElementById('quizlet-url').value = 'Error loading page.';
 	} else {
 		//put the good bits of obj in this.quizletQuandas
-		var flashcards = obj['terms'];
+		var flashcards = obj['terms'];		
 		this.quizletQuandas = [];
 		for (var ai = 0; ai < flashcards.length; ai++) {
 			var card = flashcards[ai];
