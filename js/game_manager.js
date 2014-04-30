@@ -413,7 +413,7 @@ GameManager.prototype.dealWithQuizletURL = function() {
 	var apiPrefix = 'https://api.quizlet.com/2.0/sets/';
 	var id = url.match(/quizlet\.com\/([\d]+)\//);
 		if (!id || id.length < 2) {
-			document.getElementById('quizlet-url').value = 'Error loading page.';
+			document.getElementById('quizlet-url').value = 'Wrong format! See example.';
 			return;
 		}
 		id = id[1];
