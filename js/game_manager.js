@@ -15,6 +15,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("rangeChange", this.dealWithRange.bind(this));
   this.inputManager.on("selectChange", this.dealWithSelect.bind(this));
   this.inputManager.on("quizletURLSubmit", this.dealWithQuizletURL.bind(this));
+  this.inputManager.on("updateVisitHREF", this.updateVisitHREF.bind(this));
 
   this.dealWithRange();
   this.setup();
@@ -402,6 +403,8 @@ GameManager.prototype.dealWithSelect = function() {
 		var idx = parseInt(select.value.match(/\-q(\d+)/)[1]); //idx in the array
 		document.getElementById('quizlet-form').style.display = 'inline'; //show the form
 		document.getElementById('quizlet-url').value = urls[idx];
+		document.getElementById('qz-visit-btn').href = urls[idx];
+		document.getElementById('qz-visit-btn').target = '_blank';
 		this.dealWithQuizletURL(urls[idx]);
 	} else {
 		//could be abused to escape questioning, but it's cool
@@ -426,6 +429,8 @@ GameManager.prototype.dealWithQuizletURL = function(presetURL) {
 	var id = url.match(/quizlet\.com\/([\d]+)\//);
 		if (!id || id.length < 2) {
 			document.getElementById('quizlet-url').value = 'Wrong format! See example.';
+			document.getElementById('qz-visit-btn').href = '#';
+			document.getElementById('qz-visit-btn').target = '';
 			return;
 		}
 		id = id[1];
@@ -440,6 +445,8 @@ GameManager.prototype.receiveCORSRequest = function(obj) {
 	//false if obj is totally bogus or if Quizlet returned an improper flashcard obj
 	if (!obj || obj.hasOwnProperty('error') || !obj.hasOwnProperty('terms')) {
 		document.getElementById('quizlet-url').value = 'Error loading page.';
+		document.getElementById('qz-visit-btn').href = '#';
+		document.getElementById('qz-visit-btn').target = '';
 	} else {
 		//put the good bits of obj in this.quizletQuandas
 		var flashcards = obj['terms'];		
@@ -462,5 +469,20 @@ GameManager.prototype.receiveCORSRequest = function(obj) {
 		var scr = document.getElementById('jsonp-cors');
 		var parent = scr.parentNode;
 		parent.removeChild(scr);
+	}
+};
+
+GameManager.prototype.updateVisitHREF = function() {
+	var url = document.getElementById('quizlet-url').value;
+	var a = document.getElementById('qz-visit-btn');
+	
+	if (!/^http/.test(url)) url = 'http://' + url;
+	
+	if (url.length > 10) {
+		a.href = url;
+		a.target = '_blank';
+	} else {
+		a.href = '#';
+		a.target = '';
 	}
 };

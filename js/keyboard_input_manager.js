@@ -55,10 +55,15 @@ KeyboardInputManager.prototype.listen = function () {
                     event.shiftKey;
     var mapped    = map[event.which];
 	var questionOverlay = document.querySelector(".game-message.question");
+	var pauseOverlay = document.querySelector(".game-message.overlay");
 
     if (!modifiers) {
 	  //wasd, hjkl, and <^v> and the game isn't paused
-      if (mapped !== undefined && questionOverlay.style.display !== 'block') {
+      if (mapped !== undefined && 
+		  questionOverlay.style.display !== 'block' &&
+		  pauseOverlay.style.display !== 'block' &&
+		  document.activeElement.id !== 'quizlet-url' //not typing in a url
+		  ) {
         event.preventDefault();
         self.emit("move", mapped);
       }
@@ -66,7 +71,7 @@ KeyboardInputManager.prototype.listen = function () {
 
 	// [enter] key submits the user's answer when...
     if (!modifiers && event.which === 13 &&
-	    questionOverlay.style.display === 'block' && //they're paused
+	    questionOverlay.style.display === 'block' && //they're 'question' paused
 		document.activeElement.id === 'answer-to-question') { //and focused on the text input
       self.submitAnswer();
     }
@@ -89,6 +94,9 @@ KeyboardInputManager.prototype.listen = function () {
   
   // Deal with a changing flashcard set
   this.bindSelectChange('#which-set', this.updateSelect);
+  
+  // Update the "open quizlet url: visit" link href
+  this.bindKeyup('#quizlet-url', this.updateVisitHREF);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -174,6 +182,10 @@ KeyboardInputManager.prototype.handleQuizletURL = function (event) {
   this.emit("quizletURLSubmit");
 };
 
+KeyboardInputManager.prototype.updateVisitHREF = function (event) {
+  this.emit("updateVisitHREF");
+};
+
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);
   button.addEventListener("click", fn.bind(this));
@@ -190,3 +202,7 @@ KeyboardInputManager.prototype.bindSelectChange = function (selector, fn) {
   select.addEventListener("change", fn.bind(this));
 };
 
+KeyboardInputManager.prototype.bindKeyup = function (selector, fn) {
+  var a = document.querySelector(selector);
+  a.addEventListener("keyup", fn.bind(this));
+}

@@ -576,10 +576,10 @@ input[type=range]:focus {
 	padding: 0;
 }
 #quizlet-form input[type="text"] {
-	width: 246px;
+	width: 190px;
 }
 #quizlet-form input[type="button"] {
-	width: 25px;
+	width: 38px;
 }
 input#answer-to-question {
 	height: 29px;
