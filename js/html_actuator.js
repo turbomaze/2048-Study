@@ -161,7 +161,8 @@ HTMLActuator.prototype.getRandomQandA = function(GM) {
 	}
 
 	var set = document.getElementById('which-set').value;
-	if (set === 'quizlet') {
+	var select = document.getElementById('which-set');
+	if (set === 'quizlet' || select.value.match(/\-q(\d+)/)) {
 		var idx = getRandInt(0, GM.quizletQuandas.length);
 		return GM.quizletQuandas[idx];
 	} else {

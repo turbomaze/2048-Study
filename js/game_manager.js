@@ -393,6 +393,16 @@ GameManager.prototype.dealWithSelect = function() {
 			document.querySelector(".game-message.overlay").style.display = 'block';
 			document.querySelector(".restart-button").style.color = 'rgba(238, 228, 218, 0.35)';
 		}
+	} else if (select.value.match(/\-q(\d+)/)) { //predefined quizlet URL
+		var urls = ['http://quizlet.com/17302457/us-presidents-to-learn-flash-cards/',
+					'http://quizlet.com/2429383/basic-physics-final-review-flash-cards/',
+					'http://quizlet.com/2661789/ap-lit-literary-terms-flash-cards/',
+					'http://quizlet.com/8689691/learn-you-a-haskell-for-the-great-good-functions-to-remember-flash-cards/',
+					];
+		var idx = parseInt(select.value.match(/\-q(\d+)/)[1]); //idx in the array
+		document.getElementById('quizlet-form').style.display = 'inline'; //show the form
+		document.getElementById('quizlet-url').value = urls[idx];
+		this.dealWithQuizletURL(urls[idx]);
 	} else {
 		//could be abused to escape questioning, but it's cool
 		//because keyboard inputs are frozen on question screens anyway
@@ -404,12 +414,14 @@ GameManager.prototype.dealWithSelect = function() {
 	}
 };
 
-GameManager.prototype.dealWithQuizletURL = function() {
+GameManager.prototype.dealWithQuizletURL = function(presetURL) {
 	//pause the game so they don't mess anything up
 	this.isPaused = true;
+	this.noNewGameBtn = true;
 	document.querySelector(".game-message.overlay").style.display = 'block';
+	document.querySelector(".restart-button").style.color = 'rgba(238, 228, 218, 0.35)';
 	
-	var url = document.getElementById('quizlet-url').value;
+	var url = presetURL || document.getElementById('quizlet-url').value;
 	var apiPrefix = 'https://api.quizlet.com/2.0/sets/';
 	var id = url.match(/quizlet\.com\/([\d]+)\//);
 		if (!id || id.length < 2) {
