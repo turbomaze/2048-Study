@@ -15,6 +15,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("rangeChange", this.dealWithRange.bind(this));
   this.inputManager.on("selectChange", this.dealWithSelect.bind(this));
   this.inputManager.on("quizletURLSubmit", this.dealWithQuizletURL.bind(this));
+  this.inputManager.on("updateVisitHREF", this.updateVisitHREF.bind(this));
 
   this.dealWithRange();
   this.setup();
@@ -26,6 +27,9 @@ GameManager.prototype.restart = function () {
 
   document.querySelector(".game-message.question").style.display = 'none';
   document.getElementById("answer-to-question").value = '';
+  document.getElementById('which-set').disabled = false; //enable it again
+  document.getElementById('quizlet-url').disabled = false;
+  document.getElementById('quizlet-btn').disabled = false;
   this.isPaused = false; //unpause
   
   this.storageManager.clearGameState();
@@ -390,6 +394,18 @@ GameManager.prototype.dealWithSelect = function() {
 			document.querySelector(".game-message.overlay").style.display = 'block';
 			document.querySelector(".restart-button").style.color = 'rgba(238, 228, 218, 0.35)';
 		}
+	} else if (select.value.match(/\-q(\d+)/)) { //predefined quizlet URL
+		var urls = ['http://quizlet.com/17302457/us-presidents-to-learn-flash-cards/',
+					'http://quizlet.com/2429383/basic-physics-final-review-flash-cards/',
+					'http://quizlet.com/2661789/ap-lit-literary-terms-flash-cards/',
+					'http://quizlet.com/8689691/learn-you-a-haskell-for-the-great-good-functions-to-remember-flash-cards/',
+					];
+		var idx = parseInt(select.value.match(/\-q(\d+)/)[1]); //idx in the array
+		document.getElementById('quizlet-form').style.display = 'inline'; //show the form
+		document.getElementById('quizlet-url').value = urls[idx];
+		document.getElementById('qz-visit-btn').href = urls[idx];
+		document.getElementById('qz-visit-btn').target = '_blank';
+		this.dealWithQuizletURL(urls[idx]);
 	} else {
 		//could be abused to escape questioning, but it's cool
 		//because keyboard inputs are frozen on question screens anyway
@@ -401,16 +417,20 @@ GameManager.prototype.dealWithSelect = function() {
 	}
 };
 
-GameManager.prototype.dealWithQuizletURL = function() {
+GameManager.prototype.dealWithQuizletURL = function(presetURL) {
 	//pause the game so they don't mess anything up
 	this.isPaused = true;
+	this.noNewGameBtn = true;
 	document.querySelector(".game-message.overlay").style.display = 'block';
+	document.querySelector(".restart-button").style.color = 'rgba(238, 228, 218, 0.35)';
 	
-	var url = document.getElementById('quizlet-url').value;
+	var url = presetURL || document.getElementById('quizlet-url').value;
 	var apiPrefix = 'https://api.quizlet.com/2.0/sets/';
 	var id = url.match(/quizlet\.com\/([\d]+)\//);
 		if (!id || id.length < 2) {
-			document.getElementById('quizlet-url').value = 'Error loading page.';
+			document.getElementById('quizlet-url').value = 'Wrong format! See example.';
+			document.getElementById('qz-visit-btn').href = '#';
+			document.getElementById('qz-visit-btn').target = '';
 			return;
 		}
 		id = id[1];
@@ -422,11 +442,14 @@ GameManager.prototype.dealWithQuizletURL = function() {
 };
 
 GameManager.prototype.receiveCORSRequest = function(obj) {
-	if (!obj) { //only false if there's an error
+	//false if obj is totally bogus or if Quizlet returned an improper flashcard obj
+	if (!obj || obj.hasOwnProperty('error') || !obj.hasOwnProperty('terms')) {
 		document.getElementById('quizlet-url').value = 'Error loading page.';
+		document.getElementById('qz-visit-btn').href = '#';
+		document.getElementById('qz-visit-btn').target = '';
 	} else {
 		//put the good bits of obj in this.quizletQuandas
-		var flashcards = obj['terms'];
+		var flashcards = obj['terms'];		
 		this.quizletQuandas = [];
 		for (var ai = 0; ai < flashcards.length; ai++) {
 			var card = flashcards[ai];
@@ -446,5 +469,20 @@ GameManager.prototype.receiveCORSRequest = function(obj) {
 		var scr = document.getElementById('jsonp-cors');
 		var parent = scr.parentNode;
 		parent.removeChild(scr);
+	}
+};
+
+GameManager.prototype.updateVisitHREF = function() {
+	var url = document.getElementById('quizlet-url').value;
+	var a = document.getElementById('qz-visit-btn');
+	
+	if (!/^http/.test(url)) url = 'http://' + url;
+	
+	if (url.length > 10) {
+		a.href = url;
+		a.target = '_blank';
+	} else {
+		a.href = '#';
+		a.target = '';
 	}
 };

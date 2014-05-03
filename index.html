@@ -32,6 +32,33 @@
       <p class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>
       <a class="restart-button">New Game</a>
     </div>
+	<hr>
+	<div class="controls-above-game">
+	  <label for="question-freq">
+	    ??? frequency:
+	  </label>
+	  <span id="freq-description">
+		That's not even studying
+	  </span>
+	  <br>
+      <input type="range" id="question-freq" min="0" max="100">
+	  <br>
+	  <label for="which-set">
+	    Questions:
+	  </label>
+	  <select id="which-set">
+	    <option value="apush">AP US History</option>
+		<option value="trig">Trigonometry</option>
+		<option value="uspres-q0">US Presidents</option>
+		<option value="physics-q1">Physics</option>
+		<option value="quizlet">Quizlet URL</option>
+	  </select>
+	  <span id="quizlet-form" style="display: none;">
+		<input type="text" id="quizlet-url" placeholder="Enter the URL">
+		<input type="button" id="quizlet-btn" value="Load">
+		<a id="qz-visit-btn">Visit</a>
+	  </span>
+    </div>
 
     <div class="game-container">
       <div class="game-message core">
@@ -84,30 +111,6 @@
       <div class="tile-container">
 
       </div>
-    </div>
-	
-	<div class="below-game">
-	  <label for="question-freq">
-	    ??? frequency:
-	  </label>
-	  <span id="freq-description">
-		That's not even studying
-	  </span>
-	  <br>
-      <input type="range" id="question-freq" min="0" max="100">
-	  <br>
-	  <label for="which-set">
-	    Questions:
-	  </label>
-	  <select id="which-set">
-	    <option value="apush">AP US History</option>
-		<option value="trig">Trigonometry</option>
-		<option value="quizlet">Quizlet URL</option>
-	  </select>
-	  <span id="quizlet-form" style="display: none;">
-		<input type="text" id="quizlet-url" placeholder="Enter the URL">
-		<input type="button" id="quizlet-btn" value="Go">
-	  </span>
     </div>
   </div>
 
