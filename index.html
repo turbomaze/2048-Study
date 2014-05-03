@@ -32,6 +32,33 @@
       <p class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>
       <a class="restart-button">New Game</a>
     </div>
+	<hr>
+	<div class="controls-above-game">
+	  <label for="question-freq">
+	    ??? frequency:
+	  </label>
+	  <span id="freq-description">
+		That's not even studying
+	  </span>
+	  <br>
+      <input type="range" id="question-freq" min="0" max="100">
+	  <br>
+	  <label for="which-set">
+	    Questions:
+	  </label>
+	  <select id="which-set">
+	    <option value="apush">AP US History</option>
+		<option value="uspres-q0">US Presidents</option>
+		<option value="physics-q1">Physics</option>
+		<option value="aplit-q2">Literature</option>
+		<option value="haskell-q3">Haskell</option>
+		<option value="quizlet">Quizlet URL</option>
+	  </select>
+	  <span id="quizlet-form" style="display: none;">
+		<input type="text" id="quizlet-url" placeholder="Enter the URL">
+		<input type="button" id="quizlet-btn" value="Go">
+	  </span>
+    </div>
 
     <div class="game-container">
       <div class="game-message core">
@@ -85,34 +112,7 @@
 
       </div>
     </div>
-	
-	<div class="below-game">
-	  <label for="question-freq">
-	    ??? frequency:
-	  </label>
-	  <span id="freq-description">
-		That's not even studying
-	  </span>
-	  <br>
-      <input type="range" id="question-freq" min="0" max="100">
-	  <br>
-	  <label for="which-set">
-	    Questions:
-	  </label>
-	  <select id="which-set">
-	    <option value="apush">AP US History</option>
-		<option value="uspres-q0">US Presidents</option>
-		<option value="physics-q1">Physics</option>
-		<option value="aplit-q2">Literature</option>
-		<option value="haskell-q3">Haskell</option>
-		<option value="quizlet">Quizlet URL</option>
-	  </select>
-	  <span id="quizlet-form" style="display: none;">
-		<input type="text" id="quizlet-url" placeholder="Enter the URL">
-		<input type="button" id="quizlet-btn" value="Go">
-	  </span>
-    </div>
-	
+
 	<p class="game-explanation">
       <strong class="important">How to play:</strong> Use your <strong>arrow keys</strong> to move the tiles. When two tiles with the same number touch, they <strong>merge into one!</strong> This version of 2048 includes <strong>black question tiles</strong> which, when merged, present you with a question. You can't continue playing until you answer it!
     </p>
@@ -156,6 +156,6 @@
   ga('create', 'UA-47072440-5', 'turbomaze.github.io');
   ga('require', 'displayfeatures');
   ga('send', 'pageview');
-	</script>
+  </script>
 </body>
 </html>

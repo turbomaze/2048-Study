@@ -138,7 +138,7 @@ hr {
   100% {
     opacity: 1; } }
 .game-container {
-  margin-top: 40px;
+  margin-top: 20px;
   position: relative;
   padding: 15px;
   cursor: default;
@@ -533,8 +533,8 @@ hr {
 .game-explanation {
   margin-top: 50px; }
   
-.below-game {
-	margin-top: 10px;
+.controls-above-game {
+	margin-top: -10px;
 }
 label {
 	margin-bottom: 10px;
@@ -543,15 +543,15 @@ input[type=range] {
 	-webkit-appearance: none;
 	background-color: #bbada0;
 	width: 500px;
-	height: 25px;
+	height: 15px;
 	margin: 0px;
 	float: right;
 }
 ::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	background-color: #8f7a66;
-	width: 30px;
-	height: 30px;
+	width: 25px;
+	height: 20px;
 	cursor: pointer;
 }
 input[type=range]:focus {
@@ -822,11 +822,14 @@ input#answer-to-question {
   input[type=range] {
 	width: 280px;
   }
-  
   .sharing > iframe, .sharing > span, .sharing > form {
     display: block;
     margin: 0 auto;
-    margin-bottom: 20px; }
+    margin-bottom: 20px;
+  }
+  .controls-above-game {
+	margin-bottom: 42px;
+  }
 } /* end of max(520px) media query */
 
 .btc-donate {
