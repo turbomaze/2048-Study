@@ -401,6 +401,7 @@ GameManager.prototype.dealWithSelect = function() {
 					'http://quizlet.com/8689691/learn-you-a-haskell-for-the-great-good-functions-to-remember-flash-cards/',
 					];
 		var idx = parseInt(select.value.match(/\-q(\d+)/)[1]); //idx in the array
+		ga('send', 'event', 'button', 'click', 'quizlet go', 1000+idx); //1xxx means preloaded quizlet URL
 		document.getElementById('quizlet-form').style.display = 'inline'; //show the form
 		document.getElementById('quizlet-url').value = urls[idx];
 		document.getElementById('qz-visit-btn').href = urls[idx];
