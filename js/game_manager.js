@@ -473,7 +473,10 @@ GameManager.prototype.receiveCORSRequest = function(obj) {
 		var parent = scr.parentNode;
 		parent.removeChild(scr);
 		
-		ga('send', 'event', 'button', 'click', 'quizlet go', obj['id']); //send the id
+		var select = document.getElementById('which-set');
+		if (select.value === 'quizlet') { //inputting their own, not a pre-set one
+			ga('send', 'event', 'button', 'click', 'quizlet go', obj['id']); //send the id
+		}
 	}
 };
 
